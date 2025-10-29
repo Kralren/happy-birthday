@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温馨弹窗提示</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            color: white;
+        }
+        
+        .tip-window {
+            position: fixed;
+            width: 250px;
+            height: 80px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 1000;
+            cursor: pointer;
+            transition: opacity 0.5s ease;
+            padding: 10px;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .controls {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        
+        h1 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💖 温馨弹窗提示 💖</h1>
+        
+        <div class="controls">
+            <button onclick="startTips(50)">开始弹窗 (50个)</button>
+            <button onclick="startTips(100)">开始弹窗 (100个)</button>
+            <button onclick="startTips(300)">开始弹窗 (300个)</button>
+            <button onclick="clearAllTips()">清除所有弹窗</button>
+            <button onclick="showSingleTip()">显示单个弹窗</button>
+        </div>
+        
+        <p>点击按钮开始显示温馨弹窗，每个弹窗会在3秒后自动消失</p>
+        <p>已创建弹窗: <span id="counter">0</span> 个</p>
+    </div>
+
+    <script>
+        // 提示文字列表
+        const tips = [
+        '生日快乐','保持微笑呀','天天开心',
+        '生日快乐', '保持好心情', '生日快乐', '生日快乐',
+        '梦想成真', '期待下一次见面', '生日快乐',
+        '顺顺利利', '早点休息', '愿所有烦恼都消失',
+        '别熬夜', '祝你今天过得开心', '天冷了，多穿衣服'
+        ];
+
+        // 背景颜色列表
+        const bgColors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender',
+            'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine',
+            'mistyrose', 'honeydew', 'lavenderblush', 'oldlace'
+        ];
+
+        let tipCounter = 0;
+
+        // 创建单个弹窗
+        function createTip() {
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            
+            // 创建弹窗元素
+            const tipWindow = document.createElement('div');
+            tipWindow.className = 'tip-window';
+            tipWindow.textContent = tip;
+            tipWindow.style.backgroundColor = bgColor;
+            
+            // 随机位置（确保在可视区域内）
+            const maxX = window.innerWidth - 270;
+            const maxY = window.innerHeight - 100;
+            const x = Math.floor(Math.random() * maxX);
+            const y = Math.floor(Math.random() * maxY);
+            
+            tipWindow.style.left = x + 'px';
+            tipWindow.style.top = y + 'px';
+            
+            // 添加到页面
+            document.body.appendChild(tipWindow);
+            tipCounter++;
+            document.getElementById('counter').textContent = tipCounter;
+            
+            // 点击关闭
+            tipWindow.addEventListener('click', function() {
+                this.style.opacity = '0';
+                setTimeout(() => {
+                    if (this.parentNode) {
+                        this.parentNode.removeChild(this);
+                        tipCounter--;
+                        document.getElementById('counter').textContent = tipCounter;
+                    }
+                }, 500);
+            });
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                if (tipWindow.parentNode) {
+                    tipWindow.style.opacity = '0';
+                    setTimeout(() => {
+                        if (tipWindow.parentNode) {
+                            tipWindow.parentNode.removeChild(tipWindow);
+                            tipCounter--;
+                            document.getElementById('counter').textContent = tipCounter;
+                        }
+                    }, 500);
+                }
+            }, 3000);
+        }
+
+        // 开始显示多个弹窗
+        function startTips(count) {
+            clearAllTips(); // 先清除现有的
+            
+            let created = 0;
+            const interval = setInterval(() => {
+                createTip();
+                created++;
+                
+                if (created >= count) {
+                    clearInterval(interval);
+                }
+            }, 10); // 快速创建弹窗
+        }
+
+        // 显示单个弹窗
+        function showSingleTip() {
+            createTip();
+        }
+
+        // 清除所有弹窗
+        function clearAllTips() {
+            const tips = document.querySelectorAll('.tip-window');
+            tips.forEach(tip => {
+                tip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tip.parentNode) {
+                        tip.parentNode.removeChild(tip);
+                    }
+                }, 500);
+            });
+            tipCounter = 0;
+            document.getElementById('counter').textContent = tipCounter;
+        }
+
+        // 页面加载时显示欢迎信息
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                createTip();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
